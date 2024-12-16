@@ -1,674 +1,229 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M.A.E. Menu Decoder</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&amp;display=swap" rel="stylesheet">
-    <style>
-       body {
-    font-family: 'Roboto', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f0f4f8;
-    color: #333;
-    transition: margin-left 0.3s ease;
-}
-
-.container {
-    display: flex;
-    max-width: 1000px; /* Ajuste a largura total do container */
-    margin: 0 auto; /* Centraliza o container */
-    
-}
-.sidebar {
-    width: 300px;
-    background-color: #172524;
-    color: white;
-    overflow-y: auto;
-    transition: transform 0.3s ease;
-    position: absolute;
-    height: 100%;
-    left: -300px;
-    top: 0;
-    z-index: 19;
-}
-
-/* Estilo para a sidebar quando está visível */
-.sidebar.visible {
-    transform: translateX(300px);
-}
-
-/* Contêiner para a imagem e a barra de busca */
-.sidebar.visible .fixed-container {
-    position: absolute; /* Fixa o contêiner quando a sidebar está visível */
-    top: 20px; /* Distância do topo */
-    left: 10px; /* Distância da esquerda */
-    width: 80%; /* Ajuste a largura conforme necessário */
-}
-
-/* Estilo da imagem dentro do contêiner */
-.fixed-container img {
-    width: 100%; /* Ajusta a largura da imagem para o contêiner */
-    height: auto; /* Mantém a proporção da imagem */
-}
-
-/* Estilo da barra de busca dentro do contêiner */
-.fixed-container .search-bar {
-    margin-top: 20px; /* Espaçamento entre a imagem e a barra de busca */
-    padding: 10px;
-    background-color: #34495e; /* Cor de fundo */
-}
-}
-
-.sidebar h2 {
-    text-align: left;
-    color: #ecf0f1;
-    margin: 20px 0;
-}
-
-.search-bar {
-    padding: 10px;
-    background-color: #34495e;
-}
-
-
-
-
-.search-bar input {
-    width: 100%;
-    padding: 8px;
-    border: none;
-    border-radius: 4px;
-    color: #333;
-}
-
-.category {
-    padding: 10px;
-    cursor: pointer;
-    background-color: #34495e;
-    margin-bottom: 5px;
-    text-align: left;
-}
-
-.category:hover {
-    background-color: #3b5998;
-}
-
-.course-list {
-    display: none;
-    padding-left: 20px;
-    max-height: 150px;
-    overflow-y: auto;
-}
-
-.course {
-    padding: 8px;
-    cursor: pointer;
-    background-color: #455a64;
-    text-align: left;
-    color: #ecf0f1;
-    margin-bottom: 2px;
-    border-radius: 4px;
-}
-
-.course:hover {
-    background-color: #3b5998;
-}
-
-.course.selected {
-    background-color: #2c3e50;
-}
-
-.content {
-    flex-grow: 1;
-    padding: 20px;
-    transition: margin-left 0.3s;
-    width: 100%;
-}
-
-.step {
-    background-color: white;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.button {
-    background-color: #385764;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    width: auto;
-    margin-bottom: 10px;
-    text-align: center;
-    display: inline-block;
-}
-
-.button:hover {
-    background-color: #2c3e50;
-}
-
-input[type="file"], select, input[type="text"] {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-#overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-}
-
-#popup {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    width: 90%;
-    max-width: 400px;
-    padding: 20px;
-    z-index: 1001;
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
-    text-align: left;
-}
-
-.close-popup {
-    text-align: right;
-    cursor: pointer;
-    color: red;
-    font-weight: bold;
-}
-
-.notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 15px;
-    border-radius: 4px;
-    color: white;
-    font-weight: bold;
-    z-index: 1002;
-}
-
-.notification.success {
-    background-color: #28a745;
-}
-
-.notification.error {
-    background-color: #dc3545;
-}
-
-#menuToggle {
-    display: none;
-    position: fixed;
-    top: 170px;
-    right: 10px;
-    z-index: 1001;
-    background-color: #385764;
-	opacity: 0.7;
-    color: white;
-   border: 4px solid orange; /* Borda laranja */
-    padding: 5px;
-    border-radius: 5px;
-}
-
-@media (max-width: 1200px) {
-    #menuToggle {
-        display: block;
-    }
-}
-
-@media (max-width: 992px) {
-    .sidebar {
-        width: 80%;
-        max-width: 350px;
-        left: -90%;
-    }
-
-    .sidebar.visible {
-        transform: translateX(100%);
-    }
-
-    body.sidebar-open {
-        margin-left: 0;
-    }
-
-    body.sidebar-open .content {
-        opacity: 0.7;
-        pointer-events: none;
-    }
-}
-
-@media (max-width: 768px) {
-    .content {
-        padding: 15px;
-        padding-top: 50px;
-    }
-
-    .button {
-        width: 100%;
-    }
-
-    body.sidebar-open::after {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: -10;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 999;
-    }
-}
-
-@media (max-width: 576px) {
-    .sidebar {
-        width: 90%;
-        max-width: 100%;
-    }
-}
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buscador de Palavras em JSON</title>
+  <style>
+      body {
+          font-family: Arial, sans-serif;
+          background-color: #f4f4f4;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin: 0;
+          min-height: 100vh;
+          padding: 20px;
+      }
+      .container {
+          background: white;
+          padding: 20px;
+          border-radius: 5px;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+          width: 100%;
+          max-width: 400px; /* Limita a largura máxima */
+          position: relative; /* Isola o contêiner */
+          z-index: 1000; /* Garante que fique acima de outros elementos */
+      }
+      .container > * {
+          width: 100%; /* Cada item ocupa 100% da largura do container */
+          margin: 10px 0; /* Espaçamento entre os elementos */
+      }
+      input {
+          padding: 10px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          box-sizing: border-box; /* Inclui padding e border no cálculo da largura */
+      }
+      button {
+          padding: 10px;
+          background-color: #28a745;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+      }
+      button:hover {
+          background-color: #218838;
+      }
+      button:focus {
+          outline: none;
+          box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+      }
+      /* Estilos do Modal */
+      .modal {
+          display: none; /* Oculto por padrão */
+          position: fixed; /* Fixo na tela */
+          z-index: 100; /* Acima do contêiner */
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          overflow: auto; /* Habilita rolagem se necessário */
+          background-color: rgba(0, 0, 0, 0.5); /* Fundo semi-transparente */
+          padding: 20px;
+      }
+      .modal-content {
+          background: white;
+          margin: auto;
+          padding: 20px;
+          border-radius: 5px;
+          width: 100%;
+          max-width: 600px; /* Limita a largura máxima do modal */
+          max-height: 80vh; /* Limita a altura máxima do modal */
+          overflow-y: auto; /* Habilita rolagem vertical */
+      }
+      .highlight {
+          font-weight: bold;
+          color: red;
+      }
+      p {
+          margin: 10px 0; /* Espaçamento entre parágrafos */
+      }
+      .open-button {
+          margin-top: 10px; /* Espaçamento acima do botão abrir */
+      }
+  </style>
 </head>
 <body>
-    <button id="menuToggle" onclick="toggleSidebar()">☰ Menu</button>
-    <div class="container">
+  <div class="container">
+      <h1>Buscador de Palavras</h1>
+      <input type="file" id="fileInput" accept=".json" />
+      <input type="text" id="searchInput" placeholder="Digite a palavra a procurar" />
+      <button onclick="searchWord()">Buscar</button>
+      <button onclick="saveResults()">Salvar Resultados</button>
+      <button class="open-button" onclick="loadSavedResults()">Carregar Resultados Salvos</button> <!-- Botão para carregar resultados salvos -->
+  </div>
 
-       <div class="sidebar" id="sidebar">
-    <div class="fixed-container">
-       <!-- <img src="https://d1yei2z3i6k35z.cloudfront.net/3119789/666e1df34d7ed_BannerFNWAssessoriaDigitalprovisorio.png" alt="Banner" loading="lazy"> -->
-        <h6 id="sidebar-title">Arquivo Selecionado</h6>
-        <div class="search-bar">
-            <input type="text" id="search" placeholder="Buscar assunto..." oninput="filterCourses()">
-        </div>
-        <div id="course-menu"></div>
-    </div>
-</div>
+  <!-- Modal -->
+  <div id="resultsModal" class="modal">
+      <div class="modal-content" id="resultsList">
+          <span onclick="closeModal()" style="cursor:pointer; float:right;">&times;</span> <!-- Botão para fechar o modal -->
+          <h2>Resultados da Busca</h2>
+          <div id="resultsDisplay"></div> <!-- Área para exibir os resultados -->
+      </div>
+  </div>
 
+  <script>
+      let jsonData = {};
+      let searchResults = {};
+      let lastSearchWord = ''; // Variável para armazenar a última palavra buscada
 
+      document.getElementById('fileInput').addEventListener('change', function(event) {
+          const file = event.target.files[0];
+          const reader = new FileReader();
+          reader.onload = function(e) {
+              jsonData = JSON.parse(e.target.result);
+              alert('Arquivo carregado com sucesso!'); // Feedback visual
+          };
+          reader.readAsText(file);
+      });
 
+      function searchWord() {
+          const word = document.getElementById('searchInput').value.trim().toLowerCase();
+          lastSearchWord = word; // Armazena a última palavra buscada
+          const results = {};
+          const sentences = {};
+          let totalOccurrences = 0;
 
- 
+          function countWordsAndSentences(obj) {
+              for (const key in obj) {
+                  if (typeof obj[key] === 'string') {
+                      const sanitizedText = obj[key].toLowerCase();
+                      const matches = (sanitizedText.match(new RegExp(word, 'g')) || []).length;
+                      if (matches > 0) {
+                          totalOccurrences += matches;
+                          results[key] = (results[key] || 0) + matches;
 
-        <div class="content" id="content">
+                          const sentenceMatches = sanitizedText.match(/[^.!?]*[.!?]/g);
+                          if (sentenceMatches) {
+                              sentenceMatches.forEach(sentence => {
+                                  if (sentence.includes(word)) {
+                                      sentences[sentence.trim()] = (sentences[sentence.trim()] || 0) + 1;
+                                  }
+                              });
+                          }
+                      }
+                  } else if (typeof obj[key] === 'object') {
+                      countWordsAndSentences(obj[key]);
+                  }
+              }
+          }
 
+          countWordsAndSentences(jsonData);
+          searchResults = { word, totalOccurrences, results, sentences };
 
-<img src="https://d1yei2z3i6k35z.cloudfront.net/3119789/666e1df34d7ed_BannerFNWAssessoriaDigitalprovisorio.png" alt="Banner" style="width: 80%; height: auto; display: block; margin: 0 auto;" loading="lazy">
+          displayResults();
+      }
 
-<br>
+      function displayResults() {
+          const resultsDiv = document.getElementById('resultsDisplay');
+          resultsDiv.innerHTML = `<strong>${searchResults.word}</strong> aparece <strong>${searchResults.totalOccurrences}</strong> vezes.<br>`;
+          for (const key in searchResults.results) {
+              resultsDiv.innerHTML += `<p>Na chave "${key}": ${searchResults.results[key]} vez(es)</p>`;
+          }
 
+          resultsDiv.innerHTML += `<h3>Frases que contêm "${searchResults.word}":</h3>`;
+          const sortedSentences = Object.entries(searchResults.sentences).sort((a, b) => b[1] - a[1]);
+          let mostFrequentSentence = '';
+          let highestFrequency = 0;
 
-            <h6>FNW Assessoria Digital   +5511911595028 - Alex Sobral</h6>
+          sortedSentences.forEach(([sentence, freq]) => {
+              resultsDiv.innerHTML += `<p>Frase: "${sentence}" - ${freq} vez(es)</p>`;
+              if (freq > highestFrequency) {
+                  highestFrequency = freq;
+                  mostFrequentSentence = sentence;
+              }
+          });
 
+          if (mostFrequentSentence) {
+              resultsDiv.innerHTML += `<h3>Frase mais frequente: <span class="highlight">"${mostFrequentSentence}"</span> - ${highestFrequency} vez(es)</h3>`;
+          }
 
+          // Exibir o modal com os resultados
+          document.getElementById('resultsModal').style.display = 'block';
+      }
 
+      function loadSavedResults() {
+          const fileInput = document.createElement('input');
+          fileInput.type = 'file';
+          fileInput.accept = 'application/json';
+          fileInput.onchange = function(event) {
+              const file = event.target.files[0];
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                  const savedResults = JSON.parse(e.target.result);
+                  searchResults = savedResults; // Carrega os resultados salvos
+                  displayResults(); // Exibe os resultados no modal
+              };
+              reader.readAsText(file);
+          };
+          fileInput.click(); // Abre o seletor de arquivos
+      }
 
+      function saveResults() {
+          const blob = new Blob([JSON.stringify(searchResults, null, 2)], { type: 'application/json' });
+          const sanitizedWord = lastSearchWord.replace(/[^a-zA-Z0-9]/g, '_'); // Substitui caracteres inválidos por _
+          const fileName = `resultados_busca_${sanitizedWord}_resultado.json`; // Nome do arquivo com a palavra-chave e sufixo
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName;
+          a.click();
+          URL.revokeObjectURL(url);
+      }
 
+      function closeModal() {
+          document.getElementById('resultsModal').style.display = 'none'; // Fecha o modal
+      }
 
-            
-            <div class="step">
-                <h5>1. Escolher e Carregar Arquivo</h5>
-                <input type="file" id="fileInput" accept=".json" multiple="" title="Selecione os arquivos JSON para carregar">
-                <button class="button" onclick="loadFiles()" title="Clique para carregar os arquivos selecionados">Carregar Arquivos</button>
-            </div>
-
-
-            
-            <div class="step">
-                <h5>2. Selecionar Arquivo na lista</h5>
-                <select id="fileDropdown" title="Escolha um arquivo carregado para exibir">
-                    <option value="">Selecione um arquivo</option>
-                </select>
-            </div>
-            
-            <div class="step">
-                <h5>3. Carregar da Lista</h5>
-                <button class="button" onclick="loadSelectedFile()" title="Carrega o arquivo selecionado no menu">Carregar da Lista</button>
-            </div>
-            
-            <div class="step">
-                <h5>4. Mostrar Menu</h5>
-                <button class="button toggle-button" id="toggleButton" onclick="toggleSidebar()" title="Mostra ou oculta o menu lateral">On/Off</button>
-            </div>
-            
-            <h4></h4>
-            
-            <div class="step">
-                <h5>5. Nomear e Salvar Arquivo:</h5>
-                <input type="text" id="filename-input" placeholder="Digite o nome do arquivo" title="Digite o nome para o arquivo de menu">
-                <button class="button" onclick="saveCoursesToFile()" title="Salva o menu atual em um arquivo JSON">Salvar</button>
-            </div>
-            
-            <div class="step">
-                <h5>6. Limpar Menu Sem apagar lista</h5>
-                <button class="button" onclick="clearMenu()" title="Remove todos os itens do menu sem apagar a lista de arquivos">Limpar Menu</button>
-            </div>
-            
-            <br><br><br><br>
-             <div class="step">
-                <h5>7. Item mais Recente:</h5>
-                <div id="editMenu"></div>
-                <button class="button" onclick="openMenuEditor()" title="Mostra o item mais recente">Mostrar</button>
-            </div>
-
-            <div class="step">
-                <h5>8. Gerenciar Estado:</h5>
-                <button class="button" onclick="saveState()" title="Salva o estado atual da lista de arquivos">Salvar Estado</button>
-                <button class="button" onclick="loadState()" title="Carrega o último estado salvo da lista de arquivos">Carregar Estado</button>
-                <button class="button" onclick="clearState()" title="Limpa o estado salvo e a lista de arquivos">Limpar Estado</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="overlay" onclick="hidePopup()"></div>
-    <div id="popup">
-        <div class="close-popup" onclick="hidePopup()">X</div>
-        <div id="popupContent"></div>
-        <h2 id="popup-title"></h2>
-        <p id="popup-description"></p>
-        <button class="button" id="popup-button">Abrir</button>
-    </div>
-
-    <script>
-        let currentStep = 0;
-        const steps = [
-            { action: loadFiles, label: "Clique para o próximo passo" },
-            { action: loadSelectedFile, label: "Escolher e Carregar Arquivo >" },
-            { action: saveCoursesToFile, label: "Clique em On Off" },
-            { action: saveCoursesToFile, label: "Salvar Arquivo" },
-            { action: clearMenu, label: "Limpar Menu" }
-        ];
-
-        const courses = {};
-        const originalCourses = {};
-        const fileMap = new Map();
-        const janelas = {};
-
-        function nextStep() {
-            if (currentStep < steps.length) {
-                const step = steps[currentStep];
-                step.action();
-                currentStep++;
-                updateButtonLabel();
-            } else {
-                showNotification('Você completou todas as etapas!');
-            }
-        }
-
-        function updateButtonLabel() {
-            const nextButton = document.getElementById('nextButton');
-            if (nextButton) {
-                if (currentStep < steps.length) {
-                    nextButton.innerText = steps[currentStep].label;
-                } else {
-                    nextButton.innerText = 'Concluído';
-                }
-            }
-        }
-
-        function showNotification(message, type = 'success') {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 3000);
-        }
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('visible');
-            const menuToggle = document.getElementById('menuToggle');
-            if (sidebar.classList.contains('visible')) {
-                menuToggle.textContent = '✕ Fechar';
-            } else {
-                menuToggle.textContent = '☰ Menu';
-            }
-        }
-
-        function toggleCategory(categoryId) {
-            const categoryElement = document.getElementById(categoryId);
-            categoryElement.style.display = categoryElement.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function abrirOuFocarJanela(url, title) {
-            if (janelas[title] && !janelas[title].closed) {
-                janelas[title].focus();
-            } else {
-                janelas[title] = window.open(url, title, 'width=400,height=600,left=2300,top=1000');
-            }
-        }
-
-        function showPopup(courseKey) {
-            const course = courses[courseKey];
-            if (course) {
-                document.getElementById('popup-title').innerText = course.title;
-                document.getElementById('popup-description').innerText = course.description;
-                document.getElementById('popup-button').onclick = function() {
-                    abrirOuFocarJanela(course.url, course.title);
-                };
-
-                document.getElementById('popup').style.display = 'block';
-                document.getElementById('overlay').style.display = 'block';
-            }
-        }
-
-        function hidePopup() {
-            document.getElementById('popup').style.display = 'none';
-            document.getElementById('overlay').style.display = 'none';
-        }
-
-        function filterCourses() {
-            const searchInput = document.getElementById('search').value.toLowerCase();
-            const categories = document.querySelectorAll('.course-list');
-            categories.forEach(category => {
-                const courses = category.querySelectorAll('.course');
-                let categoryHasVisibleCourses = false;
-                courses.forEach(course => {
-                    if (course.innerText.toLowerCase().includes(searchInput)) {
-                        course.style.display = 'block';
-                        categoryHasVisibleCourses = true;
-                    } else {
-                        course.style.display = 'none';
-                    }
-                });
-                category.style.display = categoryHasVisibleCourses ? 'block' : 'none';
-            });
-        }
-
-        function loadFiles() {
-            const input = document.getElementById('fileInput');
-            const files = input.files;
-            const dropdown = document.getElementById('fileDropdown');
-
-            for (const file of files) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const content = JSON.parse(e.target.result);
-                        fileMap.set(file.name, content);
-
-                        const option = document.createElement('option');
-                        option.value = file.name;
-                        option.text = file.name;
-                        dropdown.add(option);
-
-                        showNotification(`Arquivo ${file.name} carregado com sucesso!`);
-                        saveState(); // Salva o estado após cada arquivo carregado
-                    } catch (error) {
-                        console.error("Erro ao carregar o arquivo JSON:", error);
-                        showNotification(`Erro ao carregar ${file.name}: ${error.message}`, 'error');
-                    }
-                };
-                reader.readAsText(file);
-            }
-        }
-
-        function loadSelectedFile() {
-            const selectedFile = document.getElementById('fileDropdown').value;
-            if (selectedFile && fileMap.has(selectedFile)) {
-                const data = fileMap.get(selectedFile);
-                const action = confirm("Deseja substituir os cursos existentes? Clique em 'OK' para substituir ou 'Cancelar' para adicionar.");
-                if (action) {
-                    Object.keys(courses).forEach(key => delete courses[key]);
-                }
-                for (const key in data) {
-                    courses[key] = data[key];
-                }
-                updateCourseList();
-                document.getElementById('sidebar-title').innerText = ` - ✓  ${selectedFile}`;
-                showNotification(`Menu carregado de ${selectedFile}`);
-            } else {
-                showNotification('Por favor, selecione um arquivo válido.', 'error');
-            }
-        }
-
-        function saveCoursesToFile() {
-            const filename = document.getElementById('filename-input').value || 'menu';
-            const json = JSON.stringify(courses, null, 2);
-            const blob = new Blob([json], { type: 'application/json' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `${filename}.json`;
-            link.click();
-            showNotification(`Menu salvo como ${filename}.json`);
-        }
-
-        function clearMenu() {
-            Object.keys(courses).forEach(key => delete courses[key]);
-            updateCourseList();
-            showNotification('Menu limpo com sucesso!');
-        }
-
-        function updateCourseList() {
-            const courseMenu = document.getElementById('course-menu');
-            courseMenu.innerHTML = '';
-
-            const categories = {};
-            for (const key in courses) {
-                const course = courses[key];
-                const categoryName = course.category || 'Outras';
-                if (!categories[categoryName]) {
-                    categories[categoryName] = [];
-                }
-                categories[categoryName].push(course);
-            }
-
-            for (const category in categories) {
-                const newCategoryDiv = document.createElement('div');
-                newCategoryDiv.className = 'category';
-                newCategoryDiv.innerText = category;
-                const newCourseList = document.createElement('div');
-                newCourseList.className = 'course-list';
-                newCourseList.id = category.toLowerCase().replace(/\s+/g, '-');
-
-                categories[category].forEach(course => {
-                    const newCourseDiv = document.createElement('div');
-                    const courseKey = Object.keys(courses).find(key => courses[key].title === course.title);
-                    newCourseDiv.className = 'course';
-                    newCourseDiv.innerText = course.title;
-                    newCourseDiv.onclick = function() { showPopup(courseKey); };
-                    newCourseList.appendChild(newCourseDiv);
-                });
-
-                newCategoryDiv.onclick = function() { toggleCategory(newCourseList.id); };
-                courseMenu.appendChild(newCategoryDiv);
-                courseMenu.appendChild(newCourseList);
-            }
-        }
-
-        function openMenuEditor() {
-            const popup = document.getElementById('popup');
-            const popupContent = document.getElementById('popupContent');
-            popupContent.innerHTML = '<h3>Item mais recente:</h3>';
-            const lastCourse = Object.values(courses).pop();
-            if (lastCourse) {
-                popupContent.innerHTML += `
-                    <p><strong>Título:</strong> ${lastCourse.title}</p>
-                    <p><strong>Descrição:</strong> ${lastCourse.description}</p>
-                    <p><strong>URL:</strong> ${lastCourse.url}</p>
-                    <p><strong>Categoria:</strong> ${lastCourse.category}</p>
-                `;
-            } else {
-                popupContent.innerHTML += '<p>Nenhum item no menu.</p>';
-            }
-            popup.style.display = 'block';
-            document.getElementById('overlay').style.display = 'block';
-        }
-
-        function saveState() {
-            const state = {
-                fileList: Array.from(document.getElementById('fileDropdown').options).map(option => ({
-                    name: option.text,
-                    content: fileMap.get(option.value)
-                })),
-                selectedFile: document.getElementById('fileDropdown').value
-            };
-            localStorage.setItem('MAEMenuEditorState', JSON.stringify(state));
-            showNotification('Estado salvo com sucesso!');
-        }
-
-        function loadState() {
-            const savedState = localStorage.getItem('MAEMenuEditorState');
-            if (savedState) {
-                const state = JSON.parse(savedState);
-                const dropdown = document.getElementById('fileDropdown');
-                dropdown.innerHTML = '<option value="">Selecione um arquivo</option>';
-                fileMap.clear();
-                
-                state.fileList.forEach(file => {
-                    const option = document.createElement('option');
-                    option.value = file.name;
-                    option.text = file.name;
-                    dropdown.add(option);
-                    fileMap.set(file.name, file.content);
-                });
-                
-                if (state.selectedFile) {
-                    dropdown.value = state.selectedFile;
-                    loadSelectedFile();
-                }
-                showNotification('Estado carregado com sucesso!');
-            } else {
-                showNotification('Nenhum estado salvo encontrado.', 'error');
-            }
-        }
-
-        function clearState() {
-            if (confirm('Tem certeza que deseja limpar o estado salvo? Isso removerá todos os arquivos da lista.')) {
-                localStorage.removeItem('MAEMenuEditorState');
-                document.getElementById('fileDropdown').innerHTML = '<option value="">Selecione um arquivo</option>';
-                fileMap.clear();
-                showNotification('Estado limpo com sucesso!');
-            }
-        }
-
-        // Inicialização
-        document.addEventListener('DOMContentLoaded', function() {
-            updateButtonLabel();
-            updateCourseList();
-            loadState(); // Carrega o estado salvo ao iniciar a página
-        });
-
-        document.querySelectorAll('.button, #fileDropdown').forEach(element => {
-            element.addEventListener('click', () => {
-                element.classList.toggle('clicked');
-            });
-        });
-    </script>
+      // Fecha o modal quando clicar fora da área do conteúdo
+      window.onclick = function(event) {
+          const modal = document.getElementById('resultsModal');
+          if (event.target === modal) {
+              closeModal();
+          }
+      };
+  </script>
 </body>
 </html>
